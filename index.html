@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multilingual Voice & Chat App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand">TalkBridge</div>
+      <div class="lang-badge" id="activeLangDisplay">শুনছেন: বাংলা (BN)</div>
+    </header>
+
+    <!-- Main Views -->
+    <main class="main-content">
+      <!-- 1. Messages View -->
+      <section id="view-messages" class="view active">
+        <div class="chat-header">
+          <div class="friend-info">
+            <div class="avatar">R</div>
+            <div>
+              <div class="friend-name">রাহুল (Rahul)</div>
+              <div class="status-text">অনলাইন • হিন্দি ↔ বাংলা</div>
+            </div>
+          </div>
+          <button class="call-trigger-btn" onclick="startCall()" title="ভয়েস কল">📞</button>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+          <div class="msg received">
+            <div class="original-text">नमस्ते! कैसे हो भाई?</div>
+            <div class="translated-text">নমস্কার! কেমন আছো ভাই?</div>
+            <div class="msg-footer">
+              <div class="reactions">
+                <span onclick="react(this)">❤️</span>
+                <span onclick="react(this)">😢</span>
+                <span onclick="react(this)">😂</span>
+                <span onclick="react(this)">😡</span>
+                <span onclick="react(this)">👍</span>
+                <span onclick="react(this)">😳</span>
+              </div>
+              <div class="msg-actions">
+                <button onclick="copyMsg(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <button class="icon-btn" title="গ্যালারি (ছবি/ভিডিও)">📎</button>
+          <input type="text" id="msgInput" placeholder="আপনার ভাষায় লিখুন..." />
+          <button class="send-btn" onclick="sendMessage()">পাঠান</button>
+        </div>
+      </section>
+
+      <!-- 2. Voice Calls View -->
+      <section id="view-calls" class="view">
+        <div class="call-screen">
+          <div class="call-avatar">R</div>
+          <h2 class="call-name">রাহুল (Rahul)</h2>
+          <p class="call-status" id="callStatus">কল যুক্ত হয়েছে • 01:24</p>
+          <div class="direction-pill">রাহুল (হিন্দি) ➔ আপনি (বাংলা)</div>
+
+          <div class="live-caption-box">
+            <div class="caption-label">লাইভ অনুবাদ:</div>
+            <p id="liveCaption">"আমি এখন বাজারে যাচ্ছি, তুমি কি আসবে?"</p>
+          </div>
+
+          <div class="voice-mode-toggle">
+            <button id="btnTranslatedVoice" class="mode-btn active" onclick="setVoiceMode('translated')">অনূদিত কণ্ঠ</button>
+            <button id="btnOriginalVoice" class="mode-btn" onclick="setVoiceMode('original')">মূল কণ্ঠ</button>
+          </div>
+
+          <div class="call-controls">
+            <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">🎤 মিউট</button>
+            <button class="ctrl-btn" id="speakerBtn" onclick="toggleSpeaker()">🔊 স্পিকার</button>
+            <button class="ctrl-btn" onclick="switchTab('settings')">🌐 ভাষা</button>
+          </div>
+
+          <div class="call-action-row">
+            <button class="green-call-btn" onclick="acceptCall()">📞 কল ধরুন</button>
+            <button class="red-call-btn" onclick="endCall()">📵 কল কাটুন</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Voice Messages View -->
+      <section id="view-voicemsg" class="view">
+        <div class="section-card">
+          <h3>ভয়েস মেসেজ ও অনুবাদ</h3>
+          <p class="subtext">রেকর্ড করুন — প্রাপক তার নিজের ভাষায় শুনতে পাবেন।</p>
+          <div class="voice-sample-card">
+            <div class="vm-title">রাহুলের ভয়েস মেসেজ (0:12)</div>
+            <p class="vm-text">"আজ সন্ধ্যায় দেখা হচ্ছে!"</p>
+            <div class="vm-buttons">
+              <button class="primary-outline-btn" onclick="alert('অনূদিত কণ্ঠ বাজছে...')">▶ অনূদিত কণ্ঠ শুনুন</button>
+              <button class="secondary-outline-btn" onclick="alert('মূল কণ্ঠ বাজছে...')">▶ মূল কণ্ঠ শুনুন</button>
+            </div>
+          </div>
+          <button class="record-big-btn" onclick="alert('মাইক্রোফোন রেকর্ড শুরু হয়েছে...')">🎙️ ভয়েস রেকর্ড করুন</button>
+        </div>
+      </section>
+
+      <!-- 4. Settings & Friend Link View -->
+      <section id="view-settings" class="view">
+        <div class="section-card">
+          <h3>ভাষা ও সেটিংস</h3>
+          <label class="form-label">আপনি যে ভাষায় শুনতে চান (Listening Language):</label>
+          <select id="listenLangSelect" class="form-select" onchange="updateListenLang()">
+            <option value="বাংলা (BN)" selected>বাংলা (Bengali)</option>
+            <option value="English (EN)">English</option>
+            <option value="हिन्दी (HI)">हिन्दी (Hindi)</option>
+            <option value="العربية (AR)">العربية (Arabic)</option>
+          </select>
+
+          <label class="form-label">আপনার বন্ধু যুক্ত করার লিংক:</label>
+          <div class="invite-row">
+            <input type="text" readonly value="https://talkbridge.app/invite/user123" id="inviteLink" />
+            <button class="send-btn" onclick="copyInvite()">কপি</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab('messages', this)">💬 মেসেজ</button>
+      <button class="nav-item" onclick="switchTab('calls', this)">📞 ভয়েস কল</button>
+      <button class="nav-item" onclick="switchTab('voicemsg', this)">🎙️ ভয়েস মেসেজ</button>
+      <button class="nav-item" onclick="switchTab('settings', this)">⚙️ সেটিংস</button>
+    </nav>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
