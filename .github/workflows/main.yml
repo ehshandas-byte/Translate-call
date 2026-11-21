@@ -19,6 +19,7 @@ jobs:
           node-version: '20'
 
       - name: Setup Java JDK
+        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -44,6 +45,7 @@ jobs:
 
           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "JAVA_HOME=${{ steps.setup-java.outputs.path }}" >> $GITHUB_ENV
           echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
 
       - name: Prepare Project & Capacitor
@@ -69,6 +71,11 @@ jobs:
 
           if [ ! -d android ]; then
             npx cap add android
+          fi
+
+          if [ -f android/variables.gradle ]; then
+            sed -i 's/compileSdkVersion = [0-9]*/compileSdkVersion = 34/' android/variables.gradle
+            sed -i 's/targetSdkVersion = [0-9]*/targetSdkVersion = 34/' android/variables.gradle
           fi
 
           npx cap sync android
