@@ -1,13 +1,12 @@
-name: Build and Check Project
+name: Build Android APK
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,10 +18,45 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies and verify project
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Prepare Project & Capacitor
         run: |
-          if [ -f package.json ]; then
-            npm install
+          if [ ! -f package.json ]; then
+            npm init -y
           fi
-          ls -la
+          npm install
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          
+          # ওয়েব ফাইলগুলোর জন্য ফোল্ডার ঠিক করা
+          mkdir -p www
+          cp -r *.html *.css *.js www/ 2>/dev/null || true
+          
+          if [ ! -f capacitor.config.json ]; then
+            npx cap init "TranslateCall" "com.translate.call" --web-dir=www
+          fi
+          
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+
+      - name: Build Debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK File
+        uses: actions/upload-artifact@v4
+        with:
+          name: TranslateCall-App-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
           
